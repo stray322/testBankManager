@@ -2,18 +2,20 @@ name: CI/CD with Allure Report
 
 on:
   push:
+    branches:
+      - main  # Или другая ветка, где должны запускаться тесты
   pull_request:
 
 jobs:
   test-and-report:
     runs-on: ubuntu-latest
+    env:
+      CHROME_VERSION: 114 # Задайте здесь нужную версию Chrome, соответствующую вашему ChromeDriver
 
     steps:
-      # Шаг 1: Получение кода
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Шаг 2: Установка Java 17
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
@@ -21,32 +23,39 @@ jobs:
           distribution: temurin
           cache: maven
 
-      # Шаг 3: Установка Chrome и ChromeDriver
-      - name: Install ChromeDriver
-        run: |
-            sudo apt-get update
-            sudo apt-get install -y google-chrome-stable
-            sudo ln -s /usr/bin/google-chrome-stable /usr/bin/chrome
+      - name: Download ChromeDriver
+        uses: elozano/download-chromedriver@v1
+        with:
+          chromedriver_version: 114 # Версия ChromeDriver должна соответствовать CHROME_VERSION
+          chromedriver_platform: linux64
 
-      # Шаг 4: Запуск тестов с генерацией Allure-результатов
+      - name: Add ChromeDriver to PATH
+        run: echo $GITHUB_WORKSPACE/chromedriver/chromedriver >> $GITHUB_PATH
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('Ⓑ/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       - name: Run tests
-        run: |
-          mvn clean test -B
-          allure generate allure-results -o allure-report --clean
+        run: mvn clean test -B -Dwebdriver.chrome.driver=$GITHUB_WORKSPACE/chromedriver/chromedriver
 
-      # Шаг 5: Публикация отчета на GitHub Pages
-      - name: Deploy Allure Report
+      - name: Generate Allure report
+        run: allure generate target/allure-results -o target/allure-report --clean
+
+      - name: Upload Allure report
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-report
+          path: target/allure-report
+
+      - name: Deploy Allure Report (if on main branch)
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3.9.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: allure-report
+          publish_dir: ./target/allure-report
           keep_files: true
-
-      # Шаг 6: Сохранение результатов тестов
-      - name: Upload Allure results
-        uses: actions/upload-artifact@v4.3.3
-        with:
-          name: allure-results
-          path: allure-results/
-          retention-days: 3
