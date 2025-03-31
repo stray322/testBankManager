@@ -1,54 +1,52 @@
-name: CI Pipeline
+name: CI/CD with Allure Report
 
 on:
   push:
   pull_request:
 
 jobs:
-  test:
+  test-and-report:
     runs-on: ubuntu-latest
 
     steps:
+      # Шаг 1: Получение кода
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      # Шаг 2: Установка Java 17
+      - name: Set up Java
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: temurin
           cache: maven
 
-      - name: Run tests with Maven
-        run: mvn test -B
+      # Шаг 3: Установка Chrome и ChromeDriver
+      - name: Install ChromeDriver
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y google-chrome-stable
+            sudo ln -s /usr/bin/google-chrome-stable /usr/bin/chrome
 
-      - name: Generate Allure Report
-        if: always()
-        uses: simple-elf/allure-report-action@v2
-        with:
-          allure-results: target/allure-results
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      # Шаг 4: Запуск тестов с генерацией Allure-результатов
+      - name: Run tests
+        run: |
+          mvn clean test -B
+          allure generate allure-results -o allure-report --clean
 
-      - name: Upload Allure results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: allure-results
-          path: target/allure-results/
-          retention-days: 1
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3.9.3
+      # Шаг 5: Публикация отчета на GitHub Pages
+      - name: Deploy Allure Report
         if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3.9.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/allure-report
-      - name: Deploy Allure Report to GitHub Pages
-        if: github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v3.9.3
+          publish_dir: allure-report
+          keep_files: true
+
+      # Шаг 6: Сохранение результатов тестов
+      - name: Upload Allure results
+        uses: actions/upload-artifact@v4.3.3
         with:
-           github_token: ${{ secrets.GITHUB_TOKEN }}
-           publish_dir: target/allure-report
-
-
-
-
+          name: allure-results
+          path: allure-results/
+          retention-days: 3
