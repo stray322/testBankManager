@@ -25,9 +25,16 @@ public class BaseTest {
 
   @BeforeMethod
 public void setup() {
-    System.setProperty("webdriver.chrome.driver", driverPath);
-    driver = new ChromeDriver();
-    driver.get(ConfigReader.getProperty("base.url"));
+    WebDriverManager.chromedriver().setup();
+
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");          // Для CI/CD
+        options.addArguments("--no-sandbox");            // Для Linux-окружений
+        options.addArguments("--disable-dev-shm-usage"); // Решает проблемы с памятью
+
+        driver = new ChromeDriver(options);
+        driver.get(ConfigReader.getProperty("base.url"));
+
 }
 
     /**
