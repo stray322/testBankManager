@@ -10,7 +10,7 @@ jobs:
   test-and-report:
     runs-on: ubuntu-latest
     env:
-      CHROME_VERSION: 114 # Задайте здесь нужную версию Chrome, соответствующую вашему ChromeDriver
+      CHROME_VERSION: 134 # Задайте здесь нужную версию Chrome, соответствующую вашему ChromeDriver
 
     steps:
       - name: Checkout code
@@ -26,7 +26,7 @@ jobs:
       - name: Download ChromeDriver
         uses: elozano/download-chromedriver@v1
         with:
-          chromedriver_version: 114 # Версия ChromeDriver должна соответствовать CHROME_VERSION
+          chromedriver_version: 134 # Версия ChromeDriver должна соответствовать CHROME_VERSION
           chromedriver_platform: linux64
 
       - name: Add ChromeDriver to PATH
