@@ -1,28 +1,52 @@
-name: Run Tests
-on: [pull_request]
+name: CI/CD with Allure Report
+
+on:
+  push:
+  pull_request:
 
 jobs:
-  test:
+  test-and-report:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
 
-      - name: Set up Java 17
+    steps:
+      # Шаг 1: Получение кода
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Шаг 2: Установка Java 17
+      - name: Set up Java
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: 17
+          distribution: temurin
+          cache: maven
 
-      - name: Run Tests with Maven
-        run: mvn test -DsuiteXmlFile=src/test/resources/testng.xml
-
-      - name: Generate Allure Report
+      # Шаг 3: Установка Chrome и ChromeDriver
+      - name: Install ChromeDriver
         run: |
+            sudo apt-get update
+            sudo apt-get install -y google-chrome-stable
+            sudo ln -s /usr/bin/google-chrome-stable /usr/bin/chrome
+
+      # Шаг 4: Запуск тестов с генерацией Allure-результатов
+      - name: Run tests
+        run: |
+          mvn clean test -B
           allure generate allure-results -o allure-report --clean
 
-      - name: Upload Allure Report
-        uses: actions/upload-artifact@v3
+      # Шаг 5: Публикация отчета на GitHub Pages
+      - name: Deploy Allure Report
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3.9.3
         with:
-          name: allure-report
-          path: allure-report
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-report
+          keep_files: true
+
+      # Шаг 6: Сохранение результатов тестов
+      - name: Upload Allure results
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          name: allure-results
+          path: allure-results/
+          retention-days: 3
