@@ -1,12 +1,9 @@
 package tests;
 
 import io.qameta.allure.*;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.CustomersPage;
-
-import java.util.Collections;
-import java.util.List;
+import enums.SortOrder;
 
 @Epic("UI Тесты")
 @Feature("Управление клиентами")
@@ -15,25 +12,14 @@ public class SortCustomersTest extends BaseTest {
     @Test(description = "Проверка сортировки клиентов по имени")
     @Severity(SeverityLevel.NORMAL)
     @Story("Сортировка клиентов по возрастанию и убыванию")
-    public void testSortCustomersByName() {
+    public void sortCustomersByNameTest() {
         CustomersPage customersPage = new CustomersPage(driver);
-        customersPage.clickCustomersB();
-        customersPage.sortCustomersByName();
+        customersPage.clickCustomersButton();
 
-        List<String> sortedAscending = customersPage.getCustomerNames();
-        Assert.assertEquals(
-                sortedAscending.stream().sorted().toList(),
-                sortedAscending,
-                "Сортировка по возрастанию не работает"
-        );
+        customersPage.sortCustomers(SortOrder.ASCENDING)
+                .verifySortOrder(SortOrder.ASCENDING);
 
-        customersPage.sortCustomersByNamed();
-
-        List<String> sortedDescending = customersPage.getCustomerNames();
-        Assert.assertEquals(
-                sortedDescending.stream().sorted(Collections.reverseOrder()).toList(),
-                sortedDescending,
-                "Сортировка по убыванию не работает"
-        );
+        customersPage.sortCustomers(SortOrder.DESCENDING)
+                .verifySortOrder(SortOrder.DESCENDING);
     }
 }
