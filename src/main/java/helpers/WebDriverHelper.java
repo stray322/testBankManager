@@ -5,6 +5,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import utils.ConfigReader;
+
 import java.time.Duration;
 
 /**
@@ -12,8 +14,10 @@ import java.time.Duration;
  */
 public class WebDriverHelper {
 
-    public static Alert waitForAlert(WebDriver driver, int timeout) {
-        return new WebDriverWait(driver, Duration.ofSeconds(timeout))
+    private static final int TIMEOUT = ConfigReader.getTimeout();
+
+    public static Alert waitForAlert(WebDriver driver) {
+        return new WebDriverWait(driver, Duration.ofSeconds(TIMEOUT))
                 .until(ExpectedConditions.alertIsPresent());
     }
 
@@ -24,11 +28,10 @@ public class WebDriverHelper {
      * Ожидает видимости элемента на странице.
      * @param driver Экземпляр WebDriver.
      * @param element Веб-элемент.
-     * @param timeout Время ожидания в секундах.
      * @return Видимый элемент.
      */
-    public static WebElement waitForVisibility(WebDriver driver, WebElement element, int timeout) {
-        return new WebDriverWait(driver, Duration.ofSeconds(timeout))
+    public static WebElement waitForVisibility(WebDriver driver, WebElement element) {
+        return new WebDriverWait(driver, Duration.ofSeconds(TIMEOUT))
                 .until(ExpectedConditions.visibilityOf(element));
     }
 
@@ -36,11 +39,10 @@ public class WebDriverHelper {
      * Ожидает кликабельности элемента.
      * @param driver Экземпляр WebDriver.
      * @param element Веб-элемент.
-     * @param timeout Время ожидания в секундах.
      * @return Кликабельный элемент.
      */
-    public static WebElement waitForClickable(WebDriver driver, WebElement element, int timeout) {
-        return new WebDriverWait(driver, Duration.ofSeconds(timeout))
+    public static WebElement waitForClickable(WebDriver driver, WebElement element) {
+        return new WebDriverWait(driver, Duration.ofSeconds(TIMEOUT))
                 .until(ExpectedConditions.elementToBeClickable(element));
     }
 
@@ -48,10 +50,9 @@ public class WebDriverHelper {
      * Ожидает исчезновения элемента.
      * @param driver Экземпляр WebDriver.
      * @param element Веб-элемент.
-     * @param timeout Время ожидания в секундах.
      */
-    public static void waitForInvisibility(WebDriver driver, WebElement element, int timeout) {
-        new WebDriverWait(driver, Duration.ofSeconds(timeout))
+    public static void waitForInvisibility(WebDriver driver, WebElement element) {
+        new WebDriverWait(driver, Duration.ofSeconds(TIMEOUT))
                 .until(ExpectedConditions.invisibilityOf(element));
     }
 }
