@@ -21,12 +21,18 @@ public class BaseTest {
         return driver;
     }
 
-    @BeforeMethod
+  @BeforeMethod
     public void setup() {
-        WebDriverManager.chromedriver().setup();
-        driver = new ChromeDriver();
+        // Указываем версию ChromeDriver
+        WebDriverManager.chromedriver().driverVersion("119.0.6045.105").setup();
+
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+
+        driver = new ChromeDriver(options);
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.get(ConfigReader.getProperty("base.url"));
     }
 
