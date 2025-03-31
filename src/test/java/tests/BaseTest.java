@@ -24,7 +24,7 @@ public class BaseTest {
 
   @BeforeMethod
 public void setup() {
-    WebDriverManager.chromedriver().driverVersion("134.0.6998.165").setup();
+    WebDriverManager.chromedriver().driverVersion("134.0.6998.165-1").setup();
     
     ChromeOptions options = new ChromeOptions();
     options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
