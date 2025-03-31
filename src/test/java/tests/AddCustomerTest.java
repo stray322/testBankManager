@@ -1,7 +1,6 @@
 package tests;
 
 import io.qameta.allure.*;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.CustomersPage;
 import pages.ManagerPage;
@@ -18,7 +17,7 @@ public class AddCustomerTest extends BaseTest {
     @Severity(SeverityLevel.CRITICAL)
     @Story("Пользователь успешно добавляет клиента через форму")
     @Description("Проверка, что клиент создается с корректным Post Code и First Name")
-    public void testAddCustomerWithValidData() {
+    public void addCustomerWithValidDataTest() {
 
         String postCode = DataGenerator.generatePostCode();
         String firstName = DataGenerator.generateNameFromPostCode(postCode);
@@ -28,9 +27,6 @@ public class AddCustomerTest extends BaseTest {
         managerPage.addCustomer(firstName, lastName, postCode);
 
         CustomersPage customersPage = new CustomersPage(driver);
-        Assert.assertTrue(
-                customersPage.isCustomerAdded(firstName),
-                "Клиент не найден в таблице после добавления"
-        );
+        customersPage.clickCustomersButton().verifyCustomerPresent(firstName);
     }
 }
