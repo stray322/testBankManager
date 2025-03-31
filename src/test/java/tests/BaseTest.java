@@ -24,13 +24,9 @@ public class BaseTest {
 
   @BeforeMethod
     public void setup() {
-        // Указываем версию ChromeDriver
-        WebDriverManager.chromedriver().driverVersion("134.0.6998.165").setup();
-
+        WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
-        options.setBrowserVersion("stable");
-
+        options.addArguments("--headless=new");
         driver = new ChromeDriver(options);
         driver.manage().window().maximize();
         driver.get(ConfigReader.getProperty("base.url"));
