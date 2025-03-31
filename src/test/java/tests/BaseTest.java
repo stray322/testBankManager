@@ -16,7 +16,8 @@ import java.time.Duration;
  */
 @Listeners(listeners.AllureListener.class)
 public class BaseTest {
-    protected WebDriver driver;
+    String driverPath = "src/test/resources/chromedriver.exe";
+    static WebDriver driver;
 
     public WebDriver getDriver() {
         return driver;
@@ -24,13 +25,8 @@ public class BaseTest {
 
   @BeforeMethod
 public void setup() {
-    WebDriverManager.chromedriver().driverVersion("134.0.6998.165-1").setup();
-    
-    ChromeOptions options = new ChromeOptions();
-    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
-    options.setBrowserVersion("stable");
-    
-    driver = new ChromeDriver(options);
+    System.setProperty("webdriver.chrome.driver", driverPath);
+    driver = new ChromeDriver();
     driver.get(ConfigReader.getProperty("base.url"));
 }
 
