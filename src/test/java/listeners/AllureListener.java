@@ -11,7 +11,7 @@ import tests.BaseTest;
 public class AllureListener implements ITestListener {
     @Override
     public void onTestFailure(ITestResult result) {
-        WebDriver driver = ((BaseTest) result.getInstance()).getDriver(); // Используем геттер
+        WebDriver driver = ((BaseTest) result.getInstance()).getDriver();
         if (driver != null) {
             saveScreenshot(driver);
         }
