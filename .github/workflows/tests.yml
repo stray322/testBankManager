@@ -11,11 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Шаг 1: Получение кода
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Шаг 2: Установка Java 17
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
@@ -23,35 +21,21 @@ jobs:
           distribution: temurin
           cache: maven
 
-      # Шаг 3: Установка Chrome и ChromeDriver
-      - name: Set up Chrome
-        uses: actions/setup-chromedriver@v1
+      - name: Set up Chrome and ChromeDriver
+        uses: browser-actions/setup-chrome@v1
         with:
-          chrome-version: 134 # Явно указываем версию Chrome
+          chrome-version: 134
           check-latest: true
 
-      # Шаг 4: Кеширование Maven-зависимостей
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      # Шаг 5: Запуск тестов
       - name: Run tests
         run: |
           mvn clean test -B \
             -Dwebdriver.chrome.whitelistedIps="" \
             -DchromeOptions.args="--headless=new,--no-sandbox,--disable-dev-shm-usage"
 
-      # Шаг 6: Генерация Allure-отчета
       - name: Generate Allure report
-        run: |
-          allure generate target/allure-results -o target/allure-report --clean
+        run: allure generate target/allure-results -o target/allure-report --clean
 
-      # Шаг 7: Публикация отчета на GitHub Pages
       - name: Deploy Allure Report
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3.9.3
@@ -59,11 +43,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: target/allure-report
           keep_files: true
-
-      # Шаг 8: Сохранение результатов тестов
-      - name: Upload Allure results
-        uses: actions/upload-artifact@v3
-        with:
-          name: allure-results
-          path: target/allure-results/
-          retention-days: 3
