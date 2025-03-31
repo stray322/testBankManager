@@ -23,14 +23,16 @@ public class BaseTest {
     }
 
   @BeforeMethod
-    public void setup() {
-        WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
-        driver = new ChromeDriver(options);
-        driver.manage().window().maximize();
-        driver.get(ConfigReader.getProperty("base.url"));
-    }
+public void setup() {
+    WebDriverManager.chromedriver().driverVersion("134.0.6998.165").setup();
+    
+    ChromeOptions options = new ChromeOptions();
+    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
+    options.setBrowserVersion("stable");
+    
+    driver = new ChromeDriver(options);
+    driver.get(ConfigReader.getProperty("base.url"));
+}
 
     /**
      * Закрытие драйвера после всех тестов в классе.
